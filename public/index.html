@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebFPV Club Timer</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body data-theme="night">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Race desk</p>
+        <h1 id="event-title">Club race</h1>
+        <p id="step-text" class="lede">Loading the desk…</p>
+      </div>
+      <div class="top-actions">
+        <a class="button" href="/camera.html">Camera timing</a>
+        <a class="button" href="/track.html">Track map</a>
+        <a class="button" href="/spectator.html">Open the spectator screen</a>
+      </div>
+    </header>
+
+    <ol class="steps" id="steps"></ol>
+
+    <main class="layout">
+      <aside class="stack">
+        <form id="settings" class="panel stack">
+          <h2>1. Event</h2>
+          <p class="help">This name is what the spectator screen shows.</p>
+          <label>Meet name <input name="name" required maxlength="80" /></label>
+          <label>
+            Session
+            <select name="mode" id="mode"></select>
+          </label>
+          <p id="mode-help" class="help"></p>
+          <div class="split">
+            <label>Target laps <input name="laps" type="number" min="1" max="20" required /></label>
+            <label>PB laps <input name="pbLaps" type="number" min="1" max="20" required /></label>
+          </div>
+          <label>Pilots per heat <input name="maxPilotsPerRace" type="number" min="1" max="8" required /></label>
+          <label id="length-label">Session length, seconds <input name="raceLengthSeconds" type="number" min="30" max="3600" /></label>
+          <label class="check"><input name="holeshot" type="checkbox" /> First gate after the start is a holeshot, not a scoring lap</label>
+          <label class="check"><input name="sound" type="checkbox" /> Play tones for start, laps, and the finish</label>
+          <label class="check"><input name="captions" type="checkbox" /> Show a written call log for the gate</label>
+          <label>
+            Look
+            <select name="theme">
+              <option value="night">Night tower</option>
+              <option value="light">Daylight</option>
+              <option value="clear">Clear</option>
+              <option value="contrast">Black and white</option>
+              <option value="space">Space</option>
+              <option value="synth">Synth</option>
+            </select>
+          </label>
+          <details class="rules">
+            <summary>Timing and points rules</summary>
+            <fieldset class="stack">
+              <legend>Gate timing</legend>
+              <label>Minimum lap, seconds <input name="minLapSeconds" type="number" min="0" max="120" step="0.1" /></label>
+              <p class="help">Gate calls quicker than this are ignored, so a double tap or a double detection cannot make a lap.</p>
+              <label>Gate closed after the horn, seconds <input name="startIgnoreSeconds" type="number" min="0" max="30" step="0.1" /></label>
+              <div class="split">
+                <label>Start hold from, s <input name="startDelayMinSeconds" type="number" min="0" max="30" step="0.1" /></label>
+                <label>to, s <input name="startDelayMaxSeconds" type="number" min="0" max="30" step="0.1" /></label>
+              </div>
+              <p class="help">After Start, the horn sounds at a random moment in this range so nobody can jump it. Freestyle and casual practice start at once.</p>
+            </fieldset>
+            <fieldset class="stack">
+              <legend>Points</legend>
+              <label>Points by place <input name="positionPoints" inputmode="numeric" placeholder="10, 8, 6, 4, 2, 0" /></label>
+              <p class="help">First place scores the first number, and so on. Places past the end score 0. Race and endurance sessions score points.</p>
+              <label>Points for a DNF <input name="dnfPoints" type="number" min="0" max="1000" /></label>
+              <label class="check"><input name="dnfForUnfinishedRaces" type="checkbox" /> Pilots short of the target laps when a race ends are DNF</label>
+            </fieldset>
+          </details>
+          <button type="submit">Save event</button>
+        </form>
+
+        <form id="add-pilot" class="panel stack">
+          <h2>2. Pilots</h2>
+          <p class="help">Registration order is the seed order for snake draws and A/B/C finals.</p>
+          <label>Pilot name <input name="name" required maxlength="40" placeholder="Who is next?" /></label>
+          <div class="split">
+            <button type="submit">Add pilot</button>
+            <button type="button" id="sample" class="secondary">Load 8 practice names</button>
+          </div>
+          <label>Paste names, one per line <textarea name="bulk" id="bulk-pilots" rows="4" placeholder="Ada&#10;Bo&#10;Cy"></textarea></label>
+          <div class="split">
+            <button type="button" id="paste-pilots" class="secondary">Add pasted names</button>
+            <button type="button" id="copy-pilots" class="secondary">Copy the list</button>
+          </div>
+          <ul id="pilot-list" class="pilot-list"></ul>
+        </form>
+
+        <section class="panel stack">
+          <h2>3. Channels</h2>
+          <p class="help">Two channels closer than 15 MHz cannot share a heat. A pilot keeps the same channel when it still fits.</p>
+          <label>Channel set <select id="pack"></select></label>
+          <p id="pack-help" class="help"></p>
+          <button type="button" id="use-pack" class="secondary">Use this set</button>
+          <ul id="channel-list" class="pilot-list"></ul>
+          <div class="split">
+            <label>Add one channel <select id="add-channel"></select></label>
+            <button type="button" id="add-channel-button" class="secondary">Add</button>
+          </div>
+        </section>
+
+        <form id="generate" class="panel stack">
+          <h2>4. Round</h2>
+          <label>
+            Format
+            <select name="format" id="format"></select>
+          </label>
+          <p id="format-help" class="help"></p>
+          <details class="rules">
+            <summary>Add a Lua format</summary>
+            <p class="help">Format scripts use FPVTrackside’s generate() and standings() API. Put .lua files in the scripts folder, or add one here.</p>
+            <label>Script file <input type="file" id="script-file" accept=".lua,text/plain" /></label>
+          </details>
+          <p id="stage-now" class="help"></p>
+          <button type="submit">Generate round</button>
+          <details class="rules">
+            <summary>Stages and points summaries</summary>
+            <p class="help">Rounds join the stage marked “next”. A points summary totals a stage, can drop each pilot’s worst round, and can carry places from the stage before.</p>
+            <ul id="stage-list" class="pilot-list"></ul>
+            <label>New stage <input name="stage" id="stage-name" maxlength="40" placeholder="Finals" /></label>
+            <button type="button" id="new-stage" class="secondary">Open that stage</button>
+          </details>
+          <button type="button" id="remove-round" class="secondary">Remove an unstarted round</button>
+          <button type="button" id="reset" class="secondary">Start a fresh meet</button>
+          <button type="button" id="export" class="secondary">Download this meet</button>
+        </form>
+
+        <details class="panel rules" id="obs-panel">
+          <summary>OBS scenes and recording</summary>
+          <p class="help">The desk can switch OBS scenes and record each heat. Settings stay in this browser.</p>
+        </details>
+
+        <details class="panel">
+          <summary>Where these rules come from</summary>
+          <p class="help">Points, channels, start holds, and session rules follow FPVTrackside 2.78, read from the .NET libraries inside its installer. Camera timing has its own page: ArUco markers on the gate time each pilot's laps from their video, and still video can mark a crash. Without it, a person calls the gate here.</p>
+        </details>
+      </aside>
+
+      <section class="panel stage" id="board" aria-live="polite"></section>
+    </main>
+    <p id="message" class="message" role="status"></p>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

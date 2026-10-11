@@ -1,0 +1,4 @@
+.analysis/
+data/
+node_modules/
+*.msi

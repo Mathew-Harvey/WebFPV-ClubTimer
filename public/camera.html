@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Camera timing · WebFPV Club Timer</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/camera.css" />
+  </head>
+  <body data-theme="night">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Camera timing</p>
+        <h1 id="event-title">Club race</h1>
+        <p id="heat-line" class="lede">Loading the desk…</p>
+      </div>
+      <div class="top-actions">
+        <a class="button secondary" href="/">Race desk</a>
+        <a class="button secondary" href="/spectator.html">Spectator screen</a>
+      </div>
+    </header>
+
+    <ol class="steps how">
+      <li>1. Print markers and fix two on the gate</li>
+      <li>2. Pick a video source for each channel</li>
+      <li>3. Start the heat on the race desk</li>
+      <li>4. A lap is timed when the markers leave the picture</li>
+    </ol>
+
+    <main class="layout">
+      <aside class="stack">
+        <form id="settings" class="panel stack" autocomplete="off">
+          <h2>Gate detection</h2>
+          <p class="help">Changes apply at once and are kept in this browser.</p>
+          <div id="fields" class="stack"></div>
+          <button type="button" id="defaults" class="secondary">Back to FPVTrackside defaults</button>
+        </form>
+
+        <section class="panel stack">
+          <h2>Lens calibration</h2>
+          <p id="calibration-status" class="help"></p>
+          <label>camera_calibration.json <input type="file" id="calibration-file" accept=".json,application/json" /></label>
+          <button type="button" id="calibration-clear" class="secondary">Remove calibration</button>
+        </section>
+
+        <section class="panel stack">
+          <h2>Crashed pilots</h2>
+          <label class="check"><input type="checkbox" id="crash-on" /> Mark a pilot crashed when their video stops moving</label>
+          <label>Wait after the start, seconds <input type="number" id="crash-delay" min="0" max="60" step="1" /></label>
+          <p class="help">After the wait, two seconds of still video marks the pilot crashed on the desk. Three seconds of movement brings them back.</p>
+        </section>
+
+        <section class="panel stack">
+          <h2>Print markers</h2>
+          <p class="help">ArUco 4x4 markers. The gate counts as entered when enough of them are in view at once.</p>
+          <div class="split">
+            <label>Marker IDs <input id="sheet-ids" placeholder="0" /></label>
+            <label>Copies of each <input id="sheet-copies" type="number" min="1" max="8" step="1" value="2" /></label>
+          </div>
+          <label>Printed size, mm <input id="sheet-size" type="number" min="40" max="400" step="10" value="150" /></label>
+          <div id="sheet-preview" class="sheet-preview"></div>
+          <button type="button" id="sheet-print">Print markers</button>
+        </section>
+
+        <details class="panel">
+          <summary>Where this comes from</summary>
+          <p class="help">This is FPVTrackside 2.78's ArUco timing and video static detector, rebuilt from the shipped program: the same marker set, thresholds, flicker rule, lens correction, and crash timings. Marker finding is a browser port of the OpenCV detector the original calls.</p>
+        </details>
+      </aside>
+
+      <section class="stack">
+        <section class="panel stack">
+          <div class="race-head">
+            <h2>Channels</h2>
+            <button type="button" id="allow-cameras" class="secondary">Allow camera access</button>
+            <button type="button" id="all-test" class="secondary">Test pattern on the heat's channels</button>
+          </div>
+          <p class="help">Each pilot's video receiver, through a USB capture device, or a camera at the gate. Keep this tab visible while racing: browsers slow down hidden tabs.</p>
+          <div id="tiles" class="tiles"></div>
+        </section>
+
+        <section class="panel stack">
+          <h2>Gate log</h2>
+          <ol id="log" class="camera-log"></ol>
+        </section>
+      </section>
+    </main>
+    <p id="message" class="message" role="status"></p>
+    <div id="print-sheet" class="print-sheet"></div>
+    <script src="/camera.js" type="module"></script>
+  </body>
+</html>

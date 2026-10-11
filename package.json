@@ -1,0 +1,14 @@
+{
+  "name": "webfpv-clubtimer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local web timer for FPV club races: heats, laps, and bracket formats.",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test src/*.test.mjs"
+  },
+  "dependencies": {
+    "fengari": "0.1.5"
+  }
+}

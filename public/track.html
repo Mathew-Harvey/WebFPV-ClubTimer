@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Track map · WebFPV Club Timer</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body data-theme="night">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Track map</p>
+        <h1 id="event-title">Club race</h1>
+        <p class="lede">Lay out the course from above. Course pieces are flown in number order; the lap length turns lap times into speeds on the spectator screen.</p>
+      </div>
+      <div class="top-actions">
+        <a class="button" href="/">Back to the race desk</a>
+      </div>
+    </header>
+    <main class="layout">
+      <aside class="stack">
+        <section class="panel stack">
+          <h2>1. Add pieces</h2>
+          <p class="help">Pick a piece, then click the field to place it.</p>
+          <div class="palette" id="palette"></div>
+        </section>
+        <section class="panel stack" id="selected-panel">
+          <h2>2. Selected piece</h2>
+          <p class="help" id="selected-help">Click a piece to select it. Drag to move it, or drag its round handle to turn it.</p>
+          <div class="stack" id="selected-fields" hidden>
+            <div class="split">
+              <label>Across, m <input id="piece-x" type="number" step="0.5" /></label>
+              <label>Down, m <input id="piece-y" type="number" step="0.5" /></label>
+            </div>
+            <label>Facing, degrees <input id="piece-rotation" type="number" step="15" /></label>
+            <div class="split" id="order-buttons">
+              <button type="button" class="secondary" id="order-earlier">Fly earlier</button>
+              <button type="button" class="secondary" id="order-later">Fly later</button>
+            </div>
+            <button type="button" class="secondary" id="remove-piece">Remove this piece</button>
+          </div>
+        </section>
+        <section class="panel stack">
+          <h2>3. Field</h2>
+          <div class="split">
+            <label>Width, m <input id="field-width" type="number" min="10" max="500" /></label>
+            <label>Depth, m <input id="field-depth" type="number" min="10" max="500" /></label>
+          </div>
+          <label>Snap to grid, m <input id="field-grid" type="number" min="0" max="10" step="0.5" /></label>
+          <button type="button" class="secondary" id="clear-track">Clear the track</button>
+        </section>
+      </aside>
+      <section class="panel stage stack">
+        <div class="race-head">
+          <h2 id="lap-length">No course yet</h2>
+          <span class="meta" id="save-state"></span>
+        </div>
+        <canvas id="field" width="1200" height="800" tabindex="0" aria-label="Track field. Arrow keys move the selected piece, Delete removes it, Ctrl+Z undoes."></canvas>
+        <p class="help">Arrow keys nudge the selected piece. Delete removes it. Ctrl+Z undoes the last change.</p>
+      </section>
+    </main>
+    <p id="message" class="message" role="status"></p>
+    <script src="/track-editor.js" type="module"></script>
+  </body>
+</html>
